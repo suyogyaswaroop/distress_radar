@@ -1,6 +1,8 @@
 import yfinance as yf
 import pandas as pd
 import time
+import random
+
 
 def get_latest(series, field):
     """Safely extract the most recent value of a financial field"""
@@ -16,7 +18,7 @@ def calculate_z_score(ticker):
     """
     
     stock = yf.Ticker(ticker)
-    time.sleep(1.5)
+    time.sleep(random.uniform(2, 4))
 
     
     try:
