@@ -220,12 +220,18 @@ if not st.session_state.analysis_run:
 # ── RUN ANALYSIS ──────────────────────────────────────────
 tickers = [t.strip() for t in ticker_input.split("\n") if t.strip()]
 
-@st.cache_data(ttl=3600)
-def cached_score(tickers_tuple):
-    return score_multiple(list(tickers_tuple))
+with st.spinner("Loading data..."):
+    try:
+        df = score_multiple(tickers)
+        if df.empty or df['Z_Score'].isna().all():
+            raise ValueError("Live fetch failed")
+        data_source = "live"
+    except Exception:
+        df = pd.read_csv("distress_report.csv")
+        data_source = "cached"
 
-with st.spinner("Fetching live financial data..."):
-    df = cached_score(tuple(tickers))
+if data_source == "cached":
+    st.info("Showing pre-loaded data — live fetch is temporarily rate-limited by Yahoo Finance on this server. Run locally for live data.")
 
 if df.empty:
     st.error("No data returned. Check ticker symbols and try again.")
