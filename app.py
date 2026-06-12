@@ -220,8 +220,12 @@ if not st.session_state.analysis_run:
 # ── RUN ANALYSIS ──────────────────────────────────────────
 tickers = [t.strip() for t in ticker_input.split("\n") if t.strip()]
 
+@st.cache_data(ttl=3600)
+def cached_score(tickers_tuple):
+    return score_multiple(list(tickers_tuple))
+
 with st.spinner("Fetching live financial data..."):
-    df = score_multiple(tickers)
+    df = cached_score(tuple(tickers))
 
 if df.empty:
     st.error("No data returned. Check ticker symbols and try again.")
